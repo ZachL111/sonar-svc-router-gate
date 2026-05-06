@@ -1,0 +1,17 @@
+{
+  "repo": "sonar-svc-router-gate",
+  "thresholds": {
+    "signal": 2,
+    "slack": 1,
+    "confidence": 2,
+    "drag": 5,
+    "ship": 168,
+    "watch": 109
+  },
+  "terms": [
+    "queue pressure",
+    "retry load",
+    "worker slack",
+    "session drift"
+  ]
+}
