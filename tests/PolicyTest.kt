@@ -8,4 +8,7 @@ fun main() {
     val signalcase_3 = Signal(68, 99, 14, 16, 8)
     check(Policy.score(signalcase_3) == 107)
     check(Policy.classify(signalcase_3) == "review")
+    val domainReview = DomainReview(63, 36, 8, 53)
+    check(DomainReviewLens.score(domainReview) == 191)
+    check(DomainReviewLens.lane(domainReview) == "ship")
 }

@@ -1,68 +1,40 @@
 # sonar-svc-router-gate
 
-`sonar-svc-router-gate` explores backend services in Kotlin. The repository keeps the core rule set compact, then surrounds it with examples that show how the decisions move.
-
-## Sonar Svc Router Gate Notes
-
-The quickest review path is the verifier first, then the fixtures, then the operations note. That order makes it easy to see whether the code, data, and explanation still agree.
-
-## Feature Notes
-
-- Includes extended examples for queue pressure, including `surge` and `degraded`.
-- Documents bounded workers tradeoffs in `docs/operations.md`.
-- Runs locally with a single verification command and no external credentials.
-- Stores project constants and verification metadata in `metadata/project.json`.
-- Adds a repository audit script that checks structure before running the language verifier.
+`sonar-svc-router-gate` keeps a focused Kotlin implementation around backend services. The project goal is to design a Kotlin verification harness for router systems, covering event replay, fixture event logs, and failure-oriented tests.
 
 ## Why This Exists
 
-I use this kind of project to make a rule visible before adding more machinery around it. The important part here is not the size of the codebase. It is that the input signals, scoring rule, fixture data, and expected output can all be checked in one sitting.
+The point is to make a small domain rule concrete enough that a reader can change it and immediately see what broke.
 
-## Code Tour
+## Sonar Svc Router Gate Review Notes
 
-- `src`: primary implementation
-- `tests`: verification harness
-- `fixtures`: compact golden scenarios
-- `examples`: expanded scenario set
-- `metadata`: project constants and verification metadata
-- `docs`: operations and extension notes
-- `scripts`: local verification and audit commands
+For a quick review, compare `queue pressure` with `session drift` before reading the middle cases.
 
-## Implementation Notes
+## Capabilities
 
-The core is a scoring model over demand, capacity, latency, risk, and weight. That keeps job state, retry rules, and queue pressure in one explicit decision path. The threshold is 165, with risk penalty 6, latency penalty 4, and weight bonus 3. The Kotlin version keeps data classes and model logic close together for a JVM-friendly core.
+- `fixtures/domain_review.csv` adds cases for queue pressure and retry load.
+- `metadata/domain-review.json` records the same cases in structured form.
+- `config/review-profile.json` captures the read order and the two review questions.
+- `examples/sonar-svc-router-walkthrough.md` walks through the case spread.
+- The Kotlin code includes a review path for `queue pressure` and `session drift`.
+- `docs/field-notes.md` explains the strongest and weakest cases.
 
-## Try It
+## Implementation Shape
+
+The implementation keeps the scoring rule plain: reward signal and confidence, preserve slack, penalize drag, then classify the result into a review lane.
+
+The Kotlin code keeps the review rule close to the tests.
+
+## Local Usage
 
 ```powershell
 powershell -NoProfile -ExecutionPolicy Bypass -File scripts/verify.ps1
 ```
 
-This runs the language-level build or test path against the compact fixture set.
+## Verification
 
-## Example Scenarios
-
-The examples are meant to be readable before they are exhaustive. They cover enough variation to show how latency and risk can pull a decision below the threshold.
-
-## Tests
-
-```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File scripts/audit.ps1
-```
-
-The audit command checks repository structure and README constraints before it delegates to the verifier.
-
-## Boundaries
-
-The fixture set is deliberately small. That keeps the review surface clear, but it also means the model should not be treated as a complete domain simulator.
+The verifier is intentionally local. It should fail if the fixture score math, lane assignment, or language-specific test drifts.
 
 ## Roadmap
 
-- Add malformed input fixtures so the failure path is as visible as the happy path.
-- Split the scoring constants into a typed configuration object and validate it before use.
-- Add a comparison mode that shows how decisions change when one signal is adjusted.
-- Add one more backend services fixture that focuses on a malformed or borderline input.
-
-## Local Setup
-
-Use a normal shell with Kotlin available on `PATH`. The verifier is written as a PowerShell script because the portfolio was assembled on Windows.
+No external service is required. A deeper version would add more negative cases and a clearer boundary around invalid input.
